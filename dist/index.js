@@ -3212,13 +3212,21 @@ module.exports = require("zlib");
 
 /***/ }),
 
+/***/ 765:
+/***/ (function(module) {
+
+module.exports = require("process");
+
+/***/ }),
+
 /***/ 826:
 /***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
 const core = __webpack_require__(327);
 const github = __webpack_require__(712);
 const { Octokit } = __webpack_require__(320);
-const { execSync, chdir } = __webpack_require__(129);
+const { execSync } = __webpack_require__(129);
+const { chdir } = __webpack_require__(765);
 
 const PERSONAL_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 const octokit = new Octokit({

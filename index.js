@@ -1,7 +1,8 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const { Octokit } = require('@octokit/rest');
-const { execSync, chdir } = require('child_process');
+const { execSync } = require('child_process');
+const { chdir } = require('process');
 
 const PERSONAL_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 const octokit = new Octokit({
