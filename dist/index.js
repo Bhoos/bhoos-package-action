@@ -3248,7 +3248,7 @@ function getRepoName() {
 try {
   // check if draft has been released from master
   const payload = JSON.stringify(github.context.payload, undefined, 2)
-  const release = !!(payload.action && payload.action === 'released');
+  const release = !!(payload.action && payload.action === 'published');
   const packageName = getPackageProperty('name');
   if (release) {
     const currentVersion = getPackageProperty('version');
