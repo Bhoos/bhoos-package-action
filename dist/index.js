@@ -3248,23 +3248,29 @@ function getRepoName() {
 try {
   // check if draft has been released from master
   const { payload } = github.context;
+  const { repository, ref } = payload;
+  const { html_url, name } = repository;
+
+  execSync(`echo -e "machine github.com\n  login ${PERSONAL_ACCESS_TOKEN}" >> ~/.netrc`)
+  execSync(`git config --global user.email action@bhoos.com`);
+  execSync(`git config --global user.name 'Bhoos Action'`);
+
+  execSync(`git clone ${html_url} && cd ${name}`);
+  execSync(`git fetch origin`);
+
+  execSync("for remote in `git branch -r`; do git branch --track ${remote#origin/} $remote; done")
+
   const release = !!(payload.action && payload.action === 'published');
-  const packageName = getPackageProperty('name');
   if (release) {
+    const packageName = getPackageProperty('name');
     const currentVersion = getPackageProperty('version');
     // add latest tag to the current version of package
     console.log('....Adding latest Tag to current version of Package....');
     execSync(`npm dist-tag add ${packageName}@${currentVersion} latest`);
-
   } else {
-
-    const branch = execSync('git branch --show-current').toString().trim();
-    // setup config for git
-    execSync(`git config --global user.email action@bhoos.com`);
-    execSync(`git config --global user.name 'Bhoos Action'`);
-
-    execSync(`git fetch origin`);
+    const branch = ref.split('/')[2];
     execSync('git config pull.ff only');
+    execSync(`git checkout origin ${branch} && git pull origin ${branch}`);
 
     // setup  npmrc
     execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${PERSONAL_ACCESS_TOKEN}" > ~/.npmrc`);
