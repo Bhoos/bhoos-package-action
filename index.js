@@ -49,6 +49,10 @@ try {
     execSync(`git fetch origin`);
     execSync('git config pull.ff only');
 
+    // setup  npmrc
+    execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${PERSONAL_ACCESS_TOKEN}" > ~/.npmrc`);
+    execSync(`echo "//npm.pkg.github.com/:_authToken=${PERSONAL_ACCESS_TOKEN}" >> ~/.npmrc`);
+
 
     // make sure the branch is upto date with master
     execSync(`git checkout -b temp`);
@@ -72,9 +76,7 @@ try {
     execSync(`git push origin temp:master`);
 
 
-    // setup to release package
-    execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${PERSONAL_ACCESS_TOKEN}" > ~/.npmrc`);
-    execSync(`echo "//npm.pkg.github.com/:_authToken=${PERSONAL_ACCESS_TOKEN}" >> ~/.npmrc`);
+
     console.log('....Publishing Package With Next Tag....');
     execSync(`npm publish --tag=next`);
 
