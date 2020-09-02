@@ -39,7 +39,7 @@ try {
   execSync(`git config --global user.name 'Bhoos Action'`);
 
   execSync(`git clone ${html_url}`);
-  execSync(`cd ${name}`);
+  execSync(`cd package-sample`);
   console.log(execSync('ls -la').toString(), repository, name);
   execSync(`git fetch origin`);
 
