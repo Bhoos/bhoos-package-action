@@ -3218,7 +3218,7 @@ module.exports = require("zlib");
 const core = __webpack_require__(327);
 const github = __webpack_require__(712);
 const { Octokit } = __webpack_require__(320);
-const { execSync } = __webpack_require__(129);
+const { execSync, chdir } = __webpack_require__(129);
 
 const PERSONAL_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 const octokit = new Octokit({
@@ -3256,6 +3256,7 @@ try {
   execSync(`git config --global user.name 'Bhoos Action'`);
 
   console.log(execSync('mkdir someRad').toString());
+  chdir('someRad')
   console.log(execSync('cd someRad').toString());
   console.log(execSync('ls -la').toString());
 

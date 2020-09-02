@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const { Octokit } = require('@octokit/rest');
-const { execSync } = require('child_process');
+const { execSync, chdir } = require('child_process');
 
 const PERSONAL_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 const octokit = new Octokit({
@@ -39,6 +39,7 @@ try {
   execSync(`git config --global user.name 'Bhoos Action'`);
 
   console.log(execSync('mkdir someRad').toString());
+  chdir('someRad')
   console.log(execSync('cd someRad').toString());
   console.log(execSync('ls -la').toString());
 
