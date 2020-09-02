@@ -38,7 +38,9 @@ try {
   execSync(`git config --global user.email action@bhoos.com`);
   execSync(`git config --global user.name 'Bhoos Action'`);
 
-  execSync(`git clone ${html_url} && cd ${name}`);
+  execSync(`git clone ${html_url}`);
+  execSync(`cd ${name}`);
+  console.log(execSync('ls -la').toString());
   execSync(`git fetch origin`);
 
   execSync("for remote in `git branch -r`; do git branch --track ${remote#origin/} $remote; done")
