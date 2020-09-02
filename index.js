@@ -39,17 +39,9 @@ try {
   execSync(`git config --global user.email action@bhoos.com`);
   execSync(`git config --global user.name 'Bhoos Action'`);
 
-  console.log(execSync('mkdir someRad').toString());
-  console.log(execSync('ls -la').toString());
-  chdir('someRad')
-  console.log(execSync('ls -la').toString());
 
-  console.log(execSync('cd..').toString());
-
-  execSync(`git clone ${html_url} tempDir`);
-  console.log(execSync('cd tempDir').toString());
-  console.log(execSync('ls -la').toString(), repository, name);
-  console.log(execSync('cd tempDir').toString());
+  execSync(`git clone ${html_url}`);
+  chdir(`${name}`)
   console.log(execSync('ls -la').toString(), repository, name);
   execSync(`git fetch origin`);
 
