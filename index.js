@@ -40,8 +40,8 @@ try {
   execSync(`git config --global user.name 'Bhoos Action'`);
 
   console.log(execSync('mkdir someRad').toString());
+  console.log(execSync('ls -la').toString());
   chdir('someRad')
-  console.log(execSync('cd someRad').toString());
   console.log(execSync('ls -la').toString());
 
   console.log(execSync('cd..').toString());
