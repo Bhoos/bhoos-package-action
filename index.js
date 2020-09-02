@@ -41,6 +41,8 @@ try {
   execSync(`git clone ${html_url} tempDir`);
   console.log(execSync('cd tempDir').toString());
   console.log(execSync('ls -la').toString(), repository, name);
+  console.log(execSync('cd tempDir').toString());
+  console.log(execSync('ls -la').toString(), repository, name);
   execSync(`git fetch origin`);
 
   execSync("for remote in `git branch -r`; do git branch --track ${remote#origin/} $remote; done")
