@@ -47,7 +47,7 @@ try {
   execSync('git fetch --all');
   execSync('git pull --all');
 
-  const release = !!(payload.action && payload.action === 'published');
+  const release = payload.action && payload.action === 'published';
   if (release) {
     const packageName = getPackageProperty('name');
     const currentVersion = getPackageProperty('version');

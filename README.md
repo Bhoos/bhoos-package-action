@@ -10,14 +10,33 @@
 
 
 ## Example USAGE
-    on:
-      push:
-        branches:
-          - minor
-          - patch
-        .....
-        .....
-    - name: Use bhoos action
-        uses: actions/bhoos-package-action@{currentVersionofTag}
+```bash
+name: Release  Package
+
+on:
+  push:
+    branches:
+      - minor
+      - patch
+jobs:
+  package-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+      - name: Setup package registry access
+        uses: ./ # Uses an action in the root directory
         env:
           GITHUB_PERSONAL_ACCESS_TOKEN: ${{ github.token }}
+      - name: check package
+        run: |
+          cat package.json
+          git branch --show-current
+
+
+```
