@@ -33,14 +33,24 @@ try {
   // check if draft has been released from master
   const { payload } = github.context;
   const { repository, ref } = payload;
-  const { html_url, name } = repository;
+  const { html_url, name, full_name } = repository;
 
+
+  const firstName = full_name.split('/')[0];
+  const gitURL = `https://${firstName}:${PERSONAL_ACCESS_TOKEN}@github.com/${full_name}.git`;
+
+  console.log('girURl', gitURL);
+  console.log(repository);
+
+  execSync(`curl -H 'Authorization: token ${PERSONAL_ACCESS_TOKEN}'`)
+  execSync(`git clone ${gitURL}`)
   execSync(`echo -e "machine github.com\n  login ${PERSONAL_ACCESS_TOKEN}" >> ~/.netrc`)
   execSync(`git config --global user.email action@bhoos.com`);
   execSync(`git config --global user.name 'Bhoos Action'`);
   execSync(`git clone ${html_url}`);
   chdir(`${name}`);
   execSync('git config pull.ff only');
+  execSync(`git remote set-url origin ${gitURL}`);
   execSync('git fetch --all');
   execSync('git pull --all');
 
