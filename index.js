@@ -5,6 +5,7 @@ const { execSync } = require('child_process');
 const { chdir } = require('process');
 
 const PERSONAL_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
+const OWNER = process.env.PACKAGE_SCOPE || 'bhoos';
 const octokit = new Octokit({
   auth: PERSONAL_ACCESS_TOKEN,
 });
@@ -12,7 +13,7 @@ const octokit = new Octokit({
 
 async function createRelease(repoName,tag, name, body) {
   await octokit.repos.createRelease({
-    owner: 'bhoos',
+    owner: OWNER,
     repo: repoName,
     tag_name: tag,
     name,
@@ -25,9 +26,6 @@ function getPackageProperty(property) {
   return execSync(`node -p "require('./package.json').${property}"`).toString().trim();
 }
 
-function getRepoName() {
-  return execSync(`basename $(git remote get-url origin)`).toString().trim().split('.')[0];
-}
 
 try {
   // check if draft has been released from master
@@ -35,11 +33,9 @@ try {
   const { repository, ref } = payload;
   const { html_url, name, full_name } = repository;
 
-
   const firstName = full_name.split('/')[0];
   const gitURL = `https://${firstName}:${PERSONAL_ACCESS_TOKEN}@github.com/${full_name}.git`;
 
-  console.log('girURl', gitURL);
 
   execSync(`curl -H 'Authorization: token ${PERSONAL_ACCESS_TOKEN}' ${html_url}`)
   execSync(`git config --global user.email action@bhoos.com`);
@@ -51,7 +47,6 @@ try {
   execSync('git fetch --all');
   execSync('git pull --all');
 
-
   const release = !!(payload.action && payload.action === 'published');
   if (release) {
     const packageName = getPackageProperty('name');
@@ -60,13 +55,15 @@ try {
     console.log('....Adding latest Tag to current version of Package....');
     execSync(`npm dist-tag add ${packageName}@${currentVersion} latest`);
   } else {
-    const branch = ref.split('/')[2];
 
+
+    const branch = ref.split('/')[2];
     execSync(`git pull origin ${branch}`);
 
     // setup  npmrc
     execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${PERSONAL_ACCESS_TOKEN}" > ~/.npmrc`);
     execSync(`echo "//npm.pkg.github.com/:_authToken=${PERSONAL_ACCESS_TOKEN}" >> ~/.npmrc`);
+    execSync(`echo "registry=https://npm.pkg.github.com/${OWNER}" >> ~/.npmrc`);
 
 
     // make sure the branch is upto date with master
@@ -77,10 +74,10 @@ try {
     execSync(`npm version ${branch} -m "Release ${branch} version %s"`);
 
 
-  // build the package and test it
+  // test and build
     execSync(`yarn`);
-    execSync(`yarn build`);
     execSync(`yarn test`);
+    execSync(`yarn build`);
 
 
      // push the updates from temp branch to both the current branch and master branch
@@ -98,10 +95,9 @@ try {
 
     // create a draft with a tag of version name with v suffix
     const tagName = `v${getPackageProperty('version')}`;
-    const repoName = getRepoName();
 
     console.log('....Creating a release....');
-    createRelease(repoName, tagName, '', '').catch(e => {
+    createRelease(name, tagName, '', '').catch(e => {
       if (e) throw `Draft Release error ${e}`;
     });
 
