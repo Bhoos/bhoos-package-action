@@ -41,7 +41,7 @@ try {
 
   execSync(`git clone ${html_url}`);
   chdir(`${name}`)
-  console.log(execSync('ls -la').toString());
+  console.log(payload.action, payload.action === 'published');
   execSync('git config pull.ff only');
   execSync('git fetch --all');
   execSync('git pull --all');
