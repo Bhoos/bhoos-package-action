@@ -63,7 +63,7 @@ try {
     // setup  npmrc
     execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${PERSONAL_ACCESS_TOKEN}" > ~/.npmrc`);
     execSync(`echo "//npm.pkg.github.com/:_authToken=${PERSONAL_ACCESS_TOKEN}" >> ~/.npmrc`);
-    execSync(`echo "registry=https://npm.pkg.github.com/${OWNER}" >> ~/.npmrc`);
+    execSync(`echo "@${OWNER}:registry=https://npm.pkg.github.com/" >> ~/.npmrc`);
 
 
     // make sure the branch is upto date with master
