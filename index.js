@@ -38,14 +38,11 @@ try {
   execSync(`echo -e "machine github.com\n  login ${PERSONAL_ACCESS_TOKEN}" >> ~/.netrc`)
   execSync(`git config --global user.email action@bhoos.com`);
   execSync(`git config --global user.name 'Bhoos Action'`);
-
   execSync(`git clone ${html_url}`);
-  chdir(`${name}`)
-  console.log(payload.action, payload.action === 'published');
+  chdir(`${name}`);
   execSync('git config pull.ff only');
   execSync('git fetch --all');
   execSync('git pull --all');
-  console.log(execSync('git branch').toString());
 
 
   const release = !!(payload.action && payload.action === 'published');
@@ -80,8 +77,8 @@ try {
 
 
      // push the updates from temp branch to both the current branch and master branch
-    // console.log(`....Pushing Changes to ${branch} branch....`);
-    // execSync(`git push origin temp:${branch}`);
+    console.log(`....Pushing Changes to ${branch} branch....`);
+    execSync(`git push origin temp:${branch}`);
 
     console.log('....Pushing Changes to master branch....');
     execSync(`git push origin temp:master`);
