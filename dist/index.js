@@ -3267,11 +3267,9 @@ try {
   console.log(repository);
 
   execSync(`curl -H 'Authorization: token ${PERSONAL_ACCESS_TOKEN}' ${html_url}`)
-  execSync(`git clone ${gitURL}`)
-  execSync(`echo -e "machine github.com\n  login ${PERSONAL_ACCESS_TOKEN}" >> ~/.netrc`)
   execSync(`git config --global user.email action@bhoos.com`);
   execSync(`git config --global user.name 'Bhoos Action'`);
-  execSync(`git clone ${html_url}`);
+  execSync(`git clone ${gitURL}`)
   chdir(`${name}`);
   execSync('git config pull.ff only');
   execSync(`git remote set-url origin ${gitURL}`);
