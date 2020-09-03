@@ -42,10 +42,10 @@ try {
 
   execSync(`git clone ${html_url}`);
   chdir(`${name}`)
-  console.log(execSync('ls -la').toString(), repository, name);
-  execSync("for remote in `git branch -r`; do git branch --track ${remote#origin/} $remote; done")
-  execSync(`git fetch origin`);
+  console.log(execSync('ls -la').toString());
   execSync('git fetch --all');
+  console.log(execSync('git branch').toString());
+
 
   const release = !!(payload.action && payload.action === 'published');
   if (release) {
