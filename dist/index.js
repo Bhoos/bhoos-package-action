@@ -3304,8 +3304,8 @@ try {
 
 
      // push the updates from temp branch to both the current branch and master branch
-    console.log(`....Pushing Changes to ${branch} branch....`);
-    execSync(`git push origin temp:${branch}`);
+    // console.log(`....Pushing Changes to ${branch} branch....`);
+    // execSync(`git push origin temp:${branch}`);
 
     console.log('....Pushing Changes to master branch....');
     execSync(`git push origin temp:master`);
