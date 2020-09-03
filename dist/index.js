@@ -3262,13 +3262,13 @@ try {
   execSync(`echo -e "machine github.com\n  login ${PERSONAL_ACCESS_TOKEN}" >> ~/.netrc`)
   execSync(`git config --global user.email action@bhoos.com`);
   execSync(`git config --global user.name 'Bhoos Action'`);
-  execSync('git config pull.ff only');
 
   execSync(`git clone ${html_url}`);
   chdir(`${name}`)
   console.log(execSync('ls -la').toString());
   execSync('git fetch --all');
   execSync('git pull --all');
+  execSync('git config pull.ff only');
   console.log(execSync('git branch').toString());
 
 
