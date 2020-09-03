@@ -44,6 +44,7 @@ try {
   chdir(`${name}`)
   console.log(execSync('ls -la').toString());
   execSync('git fetch --all');
+  execSync('git pull --all');
   console.log(execSync('git branch').toString());
 
 
@@ -57,7 +58,7 @@ try {
   } else {
     const branch = ref.split('/')[2];
     execSync('git config pull.ff only');
-    execSync(`git checkout origin ${branch} && git pull origin ${branch}`);
+    execSync(`git pull origin ${branch}`);
 
     // setup  npmrc
     execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${PERSONAL_ACCESS_TOKEN}" > ~/.npmrc`);
