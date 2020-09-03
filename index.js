@@ -38,7 +38,7 @@ try {
   execSync(`echo -e "machine github.com\n  login ${PERSONAL_ACCESS_TOKEN}" >> ~/.netrc`)
   execSync(`git config --global user.email action@bhoos.com`);
   execSync(`git config --global user.name 'Bhoos Action'`);
-
+  execSync('git config pull.ff only');
 
   execSync(`git clone ${html_url}`);
   chdir(`${name}`)
@@ -57,7 +57,7 @@ try {
     execSync(`npm dist-tag add ${packageName}@${currentVersion} latest`);
   } else {
     const branch = ref.split('/')[2];
-    execSync('git config pull.ff only');
+
     execSync(`git pull origin ${branch}`);
 
     // setup  npmrc
