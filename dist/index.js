@@ -3264,7 +3264,6 @@ try {
   const gitURL = `https://${firstName}:${PERSONAL_ACCESS_TOKEN}@github.com/${full_name}.git`;
 
   console.log('girURl', gitURL);
-  console.log(repository);
 
   execSync(`curl -H 'Authorization: token ${PERSONAL_ACCESS_TOKEN}' ${html_url}`)
   execSync(`git config --global user.email action@bhoos.com`);
