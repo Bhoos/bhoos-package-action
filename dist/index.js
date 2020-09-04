@@ -3212,6 +3212,13 @@ module.exports = require("zlib");
 
 /***/ }),
 
+/***/ 765:
+/***/ (function(module) {
+
+module.exports = require("process");
+
+/***/ }),
+
 /***/ 826:
 /***/ (function(__unusedmodule, __unusedexports, __webpack_require__) {
 
@@ -3219,16 +3226,17 @@ const core = __webpack_require__(327);
 const github = __webpack_require__(712);
 const { Octokit } = __webpack_require__(320);
 const { execSync } = __webpack_require__(129);
+const { chdir } = __webpack_require__(765);
 
-const PERSONAL_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
-const octokit = new Octokit({
-  auth: PERSONAL_ACCESS_TOKEN,
-});
+const NPM_PKG_GITHUB_TOKEN = process.env.NPM_PKG_GITHUB_TOKEN;
+const OWNER = process.env.PACKAGE_SCOPE || 'bhoos';
 
-
-async function createRelease(repoName,tag, name, body) {
+async function createRelease(repoName,tag, name, body, token) {
+  const octokit = new Octokit({
+    auth: token,
+  });
   await octokit.repos.createRelease({
-    owner: 'bhoos',
+    owner: OWNER,
     repo: repoName,
     tag_name: tag,
     name,
@@ -3241,30 +3249,55 @@ function getPackageProperty(property) {
   return execSync(`node -p "require('./package.json').${property}"`).toString().trim();
 }
 
-function getRepoName() {
-  return execSync(`basename $(git remote get-url origin)`).toString().trim().split('.')[0];
+function setupNPMRC(token) {
+    // setup  npmrc
+    execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${token}" > ~/.npmrc`);
+    execSync(`echo "//npm.pkg.github.com/:_authToken=${token}" >> ~/.npmrc`);
+    execSync(`echo "@${OWNER}:registry=https://npm.pkg.github.com/" >> ~/.npmrc`);
 }
+
 
 try {
   // check if draft has been released from master
-  const payload = JSON.stringify(github.context.payload, undefined, 2)
-  const release = !!(payload.action && payload.action === 'released');
-  const packageName = getPackageProperty('name');
+  const { payload } = github.context;
+  const { repository, ref } = payload;
+  const { html_url, name, full_name } = repository;
+  const GITHUB_TOKEN = core.getInput('token', { required: true });
+
+  const firstName = full_name.split('/')[0];
+  const gitURL = `https://${firstName}:${GITHUB_TOKEN}@github.com/${full_name}.git`;
+
+
+  execSync(`curl -H 'Authorization: token ${GITHUB_TOKEN}' ${html_url}`)
+  execSync(`git config --global user.email action@bhoos.com`);
+  execSync(`git config --global user.name 'Bhoos Action'`);
+  execSync(`git clone ${gitURL}`)
+  chdir(`${name}`);
+  execSync('git config pull.ff only');
+  execSync(`git remote set-url origin ${gitURL}`);
+  execSync('git fetch --all');
+  execSync('git pull --all');
+
+
+
+
+
+  const release = payload.action && payload.action === 'published';
   if (release) {
+    const packageName = getPackageProperty('name');
     const currentVersion = getPackageProperty('version');
+    // setup  npmrc using github token
+    console.log('....Setting NPMRC....');
+    setupNPMRC(GITHUB_TOKEN);
     // add latest tag to the current version of package
     console.log('....Adding latest Tag to current version of Package....');
     execSync(`npm dist-tag add ${packageName}@${currentVersion} latest`);
-
   } else {
 
-    const branch = execSync('git branch --show-current').toString().trim();
-    // setup config for git
-    execSync(`git config --global user.email action@bhoos.com`);
-    execSync(`git config --global user.name 'Bhoos Action'`);
 
-    execSync(`git fetch origin`);
-    execSync('git config pull.ff only');
+    const branch = ref.split('/')[2];
+    execSync(`git pull origin ${branch}`);
+
 
 
     // make sure the branch is upto date with master
@@ -3274,11 +3307,13 @@ try {
     console.log(`....Updating npm version using ${branch}....`);
     execSync(`npm version ${branch} -m "Release ${branch} version %s"`);
 
-
-  // build the package and test it
-    execSync(`yarn`);
-    execSync(`yarn build`);
-    execSync(`yarn test`);
+    console.log('....Setting NPMRC using personal access token....');
+    // setup npm rc using read access from token
+    setupNPMRC(NPM_PKG_GITHUB_TOKEN);
+    // test and build
+    execSync(`yarn install`);
+    execSync(`yarn run test`);
+    execSync(`yarn run build`);
 
 
      // push the updates from temp branch to both the current branch and master branch
@@ -3288,20 +3323,20 @@ try {
     console.log('....Pushing Changes to master branch....');
     execSync(`git push origin temp:master`);
 
+    // setup  npmrc using github token
+    console.log('....Setting NPMRC....');
+    setupNPMRC(GITHUB_TOKEN);
 
-    // setup to release package
-    execSync(`echo "//npm.pkg.github.com/bhoos/:_authToken=${PERSONAL_ACCESS_TOKEN}" > ~/.npmrc`);
-    execSync(`echo "//npm.pkg.github.com/:_authToken=${PERSONAL_ACCESS_TOKEN}" >> ~/.npmrc`);
+
     console.log('....Publishing Package With Next Tag....');
     execSync(`npm publish --tag=next`);
 
 
     // create a draft with a tag of version name with v suffix
     const tagName = `v${getPackageProperty('version')}`;
-    const repoName = getRepoName();
 
     console.log('....Creating a release....');
-    createRelease(repoName, tagName, '', '').catch(e => {
+    createRelease(name, tagName, '', '', GITHUB_TOKEN).catch(e => {
       if (e) throw `Draft Release error ${e}`;
     });
 
